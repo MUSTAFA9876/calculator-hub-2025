@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Modern Calculator Suite</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      min-height:100vh;
+      background: linear-gradient(130deg, #12c2e9 0%, #c471ed 67%, #f64f59 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding:0; margin:0;
+    }
+    h1 { font-size:2em; color:#fff; margin:30px 5px 5px 5px; text-shadow:1px 2px 7px #2227; }
+    .subtitle { color:#fff9; margin-bottom:19px; font-size:1.05em;}
+    .tabs-flex { display: flex; flex-wrap:wrap; justify-content:center; margin-bottom:22px; gap:9px; }
+    .tabs-flex button {
+      background: #fff; font-weight:700; color: #5356ad; border:none; padding:12px 16px 12px 13px;
+      border-radius: 22px; font-size:1.05em; 
+      box-shadow:0 2px 8px #2222;
+      cursor: pointer; transition: background 0.19s, color 0.17s, transform .14s;
+      display:flex; align-items:center; gap:8px;
+    }
+    .tabs-flex button:hover, .tabs-flex button:focus {
+      background: #c471ed; color:#fff; outline:none; transform:scale(1.09);
+    }
+
+    .calc-cards { display:flex; flex-direction:column; align-items:center; }
+    .calc-card {
+      background: #fffffffa;
+      padding:20px 19px 10px 19px;
+      margin: 16px auto 8px auto;
+      box-shadow:0 6px 28px #0003,0 0 3px #f6f6f6a4;
+      border-radius:18px;
+      min-width:270px; max-width:363px;
+      border:2px solid #b481e7;
+      display:none;
+      animation: fadeIn .56s cubic-bezier(.24,1.11,.39,1.37);
+      transition: box-shadow .18s;
+    }
+    .calc-card h2 { color:#c471ed; letter-spacing:.6px; margin-bottom:9px;}
+    .calc-card input[type="number"], .calc-card input[type="text"], .calc-card input[type="date"], .calc-card select {
+      margin:4px 0 13px 0; font-size:1em; min-width:67%; border:1.6px solid #ccc;
+      padding:8px 12px; border-radius: 7px; outline:none;
+      transition: border .2s;
+    }
+    .calc-card input:focus, .calc-card select:focus { border:2px solid #c471ed;}
+    .calc-card button {
+      padding:10px 19px; font-weight:700; font-size:1em; margin:7px 0 9px 0;
+      border-radius: 7px;
+      background: linear-gradient(90deg, #f9b348 15%, #ff726d 90%);
+      color: #2c2435; border:none; box-shadow: 0 1.5px 4px #9992;
+      cursor: pointer; transition: background 0.16s, color .13s;
+    }
+    .calc-card button:hover { background:linear-gradient(90deg,#c471ed 10%,#12c2e9 90%); color:#fff;}
+    .result {
+      font-size:1.14em; color: #19a57a; margin:10px 0 4px 0; font-weight:bold; letter-spacing:.07em;
+      text-shadow:1px 1px 1px #f8f8f8;
+    }
+
+    /* Basic Calculator Keypad Styling */
+    .calc-keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6.5px;
+      margin:13px 0 6px 0;
+    }
+    .calc-keypad button {
+      font-size:1.23em; font-weight:600;
+      background:#f6f6fa; border:1.6px solid #d4cbff;
+      color:#4a326b; border-radius:7px; padding:10px 0; box-shadow:0 1.5px 3px #d4cbff44;
+      transition: background 0.15s, color 0.13s;
+    }
+    .calc-keypad button.op  { background: #f9e1ff; color:#b481e7;}
+    .calc-keypad button.eq  { background: #fffed6; color:#e57a00;}
+    .calc-keypad button.clr { background: #ffdbd4; color:#db4461;}
+    .calc-keypad button:active {
+      background: #c471ed; color:#fff;
+    }
+    .calc-keypad button[style*="width"] { grid-column: span 2;}
+    @keyframes fadeIn {0%{opacity:0;transform:translateY(16px);} 100%{opacity:1;transform:translateY(0);}}
+
+    @media(max-width:540px){
+      .calc-card{padding:16px 4px; min-width: 98vw;}
+      .tabs-flex button{padding:9px 7px;font-size:.97em;}
+    }
+  </style>
+</head>
+<body>
+<h1>✨ Calculator Suite</h1>
+<p class="subtitle">Sab calculation ek jagah – tab ya icon pe click karein!</p>
+<div class="tabs-flex">
+  <button onclick="openCalc('normal')"><span>🧮</span> Basic</button>
+  <button onclick="openCalc('age')"><span>🎂</span> Age</button>
+  <button onclick="openCalc('bmi')"><span>💪</span> BMI</button>
+  <button onclick="openCalc('gst')"><span>🧾</span> GST</button>
+  <button onclick="openCalc('sip')"><span>📈</span> SIP</button>
+  <button onclick="openCalc('mortgage')"><span>🏠</span> Mortgage</button>
+  <button onclick="openCalc('currency')"><span>💱</span> Currency</button>
+  <button onclick="openCalc('tip')"><span>🍽️</span> Tip</button>
+  <button onclick="openCalc('discount')"><span>🏷️</span> Discount</button>
+</div>
+
+<div class="calc-cards">
+
+  <!-- BASIC CALCULATOR -->
+  <div id="normal" class="calc-card">
+    <h2>🧮 Basic Calculator</h2>
+    <input type="text" id="normalCalcInput" readonly style="width:92%;text-align:right;background:#f6faff;border:2px solid #aaa;font-size:1.33em;border-radius:7px;margin-bottom:7px;">
+    <div class="calc-keypad">
+      <button onclick="normalAddNum('7')">7</button>
+      <button onclick="normalAddNum('8')">8</button>
+      <button onclick="normalAddNum('9')">9</button>
+      <button class="op" onclick="normalAddOp('/')">÷</button>
+      <button onclick="normalAddNum('4')">4</button>
+      <button onclick="normalAddNum('5')">5</button>
+      <button onclick="normalAddNum('6')">6</button>
+      <button class="op" onclick="normalAddOp('*')">×</button>
+      <button onclick="normalAddNum('1')">1</button>
+      <button onclick="normalAddNum('2')">2</button>
+      <button onclick="normalAddNum('3')">3</button>
+      <button class="op" onclick="normalAddOp('-')">−</button>
+      <button onclick="normalAddNum('0')">0</button>
+      <button onclick="normalAddDot('.')">.</button>
+      <button class="eq" onclick="normalCalcEqual()">=</button>
+      <button class="op" onclick="normalAddOp('+')">+</button>
+      <button class="clr" onclick="normalCalcClear()" style="grid-column:1/3">C</button>
+      <button class="clr" onclick="normalCalcBack()" style="grid-column:3/5">⌫</button>
+    </div>
+    <div class="result" id="normalCalcResult"></div>
+  </div>
+
+  <!-- AGE CALCULATOR -->
+  <div id="age" class="calc-card" style="display:none;">
+    <h2>🎂 Age Calculator</h2>
+    <input type="date" id="dob" />
+    <button onclick="calculateFullAge()">Calculate</button>
+    <div class="result" id="ageFullResult">Your Age: –</div>
+  </div>
+
+  <!-- BMI CALCULATOR -->
+  <div id="bmi" class="calc-card" style="display:none;">
+    <h2>💪 BMI Calculator</h2>
+    <input type="number" id="weight" placeholder="Weight (kg)">
+    <input type="number" id="height" placeholder="Height (m)">
+    <button onclick="calculateBMI()">Calculate</button>
+    <div class="result" id="bmiResult">BMI: –</div>
+  </div>
+
+  <!-- GST CALCULATOR -->
+  <div id="gst" class="calc-card" style="display:none;">
+    <h2>🧾 GST Calculator</h2>
+    <input type="number" id="amountGst" placeholder="Amount">
+    <input type="number" id="rateGst" placeholder="GST Rate %">
+    <button onclick="calculateGST()">Calculate</button>
+    <div class="result" id="gstResult">Total: –</div>
+  </div>
+
+  <!-- SIP CALCULATOR -->
+  <div id="sip" class="calc-card" style="display:none;">
+    <h2>📈 SIP Calculator</h2>
+    <input type="number" id="monthlySIP" placeholder="Monthly Invest">
+    <input type="number" id="rateSIP" placeholder="Rate %">
+    <input type="number" id="yearsSIP" placeholder="Years">
+    <button onclick="calculateSIP()">Calculate</button>
+    <div class="result" id="sipResult">Future Value: –</div>
+  </div>
+
+  <!-- MORTGAGE CALCULATOR -->
+  <div id="mortgage" class="calc-card" style="display:none;">
+    <h2>🏠 Mortgage Calculator</h2>
+    <input type="number" id="amountMortgage" placeholder="Loan Amt">
+    <input type="number" id="rateMortgage" placeholder="Rate %">
+    <input type="number" id="yearsMortgage" placeholder="Years">
+    <button onclick="calculateMortgage()">Calculate</button>
+    <div class="result" id="mortgageResult">Monthly EMI: –</div>
+  </div>
+
+  <!-- CURRENCY CALCULATOR -->
+  <div id="currency" class="calc-card" style="display:none;">
+    <h2>💱 Currency Converter</h2>
+    <input type="number" id="amountCurrency" placeholder="Amount" />
+    <select id="fromCurr">
+      <option value="USD" selected>USD</option>
+      <option value="INR">INR</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+    </select>
+    <span>→</span>
+    <select id="toCurr">
+      <option value="INR" selected>INR</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+    </select>
+    <button onclick="convertCurrencyLive()">Convert</button>
+    <div class="result" id="currencyLiveResult">Converted: –</div>
+  </div>
+
+  <!-- TIP CALCULATOR -->
+  <div id="tip" class="calc-card" style="display:none;">
+    <h2>🍽️ Tip Calculator</h2>
+    <input type="number" id="billTip" placeholder="Bill">
+    <input type="number" id="tipTip" placeholder="Tip %">
+    <button onclick="calculateTip()">Calculate</button>
+    <div class="result" id="tipResult">Total: –</div>
+  </div>
+
+  <!-- DISCOUNT CALCULATOR -->
+  <div id="discount" class="calc-card" style="display:none;">
+    <h2>🏷️ Discount Calculator</h2>
+    <input type="number" id="priceDiscount" placeholder="Price">
+    <input type="number" id="discountDiscount" placeholder="Discount %">
+    <button onclick="calculateDiscount()">Calculate</button>
+    <div class="result" id="discountResult">Final Price: –</div>
+  </div>
+</div>
+
+<script>
+// Tab show logic
+function openCalc(id) {
+  var cards = document.getElementsByClassName('calc-card');
+  for(let i=0;i<cards.length;i++) cards[i].style.display='none';
+  document.getElementById(id).style.display='block';
+}
+window.onload = ()=> openCalc('normal'); // Open basic calculator by default
+
+// BASIC CALCULATOR
+let normalInput = '';
+function normalAddNum(n) {
+  normalInput += n;
+  updateNormalCalc();
+}
+function normalAddOp(op) {
+  if (normalInput === '') return;
+  let last = normalInput[normalInput.length-1];
+  if ('+-*/'.includes(last)) normalInput = normalInput.slice(0,-1) + op;
+  else normalInput += op;
+  updateNormalCalc();
+}
+function normalAddDot(dot) {
+  let tokens = normalInput.split(/[\+\-\*\/]/);
+  let last = tokens[tokens.length-1];
+  if (!last.includes('.')) {
+    normalInput += dot;
+    updateNormalCalc();
+  }
+}
+function normalCalcEqual() {
+  try {
+    if(normalInput==='') return;
+    let ev = eval(normalInput.replace(/[^0-9\+\-\*\.\/]/g,''));
+    document.getElementById('normalCalcResult').innerHTML = "Result: " + ev;
+    normalInput = '' + ev;
+    updateNormalCalc();
+  } catch {
+    document.getElementById('normalCalcResult').innerHTML = "Invalid!";
+  }
+}
+function normalCalcClear() {
+  normalInput = '';
+  updateNormalCalc();
+  document.getElementById('normalCalcResult').innerHTML = '';
+}
+function normalCalcBack() {
+  normalInput = normalInput.slice(0,-1);
+  updateNormalCalc();
+}
+function updateNormalCalc() {
+  document.getElementById('normalCalcInput').value = normalInput;
+}
+
+// --- AGE CALCULATOR (years, months, days) ---
+function calculateFullAge() {
+  let dob = new Date(document.getElementById('dob').value);
+  if (!dob.getTime()) return setResult('ageFullResult', 'Please select birthday!');
+  let today = new Date();
+  let y = today.getFullYear() - dob.getFullYear();
+  let m = today.getMonth() - dob.getMonth();
+  let d = today.getDate() - dob.getDate();
+  if (d < 0) {
+    m--;
+    d += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  }
+  if (m < 0) {
+    y--;
+    m += 12;
+  }
+  let t = `Your Age: ${y} years, ${m} months, ${d} days`;
+  setResult('ageFullResult', t);
+}
+
+// --- BMI ---
+function calculateBMI() {
+  var w = parseFloat(document.getElementById('weight').value);
+  var h = parseFloat(document.getElementById('height').value);
+  if(!w||!h||h==0) return setResult('bmiResult','Enter valid values!');
+  let bmi=w/(h*h);
+  setResult('bmiResult',"BMI: "+bmi.toFixed(2));
+}
+
+// --- GST ---
+function calculateGST() {
+  var a = parseFloat(document.getElementById('amountGst').value);
+  var r = parseFloat(document.getElementById('rateGst').value);
+  if(!a||!r) return setResult('gstResult','Please fill all fields!');
+  let t=a+(a*r/100);
+  setResult('gstResult',"Total: "+t.toFixed(2));
+}
+
+// --- SIP ---
+function calculateSIP() {
+  var m=parseFloat(document.getElementById('monthlySIP').value);
+  var r=parseFloat(document.getElementById('rateSIP').value)/100/12;
+  var n=parseFloat(document.getElementById('yearsSIP').value)*12;
+  if(!m||!r||!n) return setResult('sipResult','Please fill all fields!');
+  let f=m*((Math.pow((1+r),n)-1)/r)*(1+r);
+  setResult('sipResult',"Future Value: "+f.toFixed(2));
+}
+
+// --- Mortgage ---
+function calculateMortgage() {
+  var a=parseFloat(document.getElementById('amountMortgage').value);
+  var r=parseFloat(document.getElementById('rateMortgage').value)/100/12;
+  var n=parseFloat(document.getElementById('yearsMortgage').value)*12;
+  if(!a||!r||!n) return setResult('mortgageResult','Please fill all fields!');
+  var emi=a*r*(Math.pow(1+r,n)/(Math.pow(1+r,n)-1));
+  setResult('mortgageResult',"Monthly EMI: "+emi.toFixed(2));
+}
+
+// --- CURRENCY CONVERTER --- (dropdown, demo static rates)
+const rateMatrix = {
+  USD: {USD:1, INR:83, EUR:0.93, GBP:0.79},
+  INR: {USD:1/83,INR:1, EUR:0.0113, GBP:0.0095},
+  EUR: {USD:1.08, INR:89, EUR:1, GBP:0.85},
+  GBP: {USD:1.27, INR:104, EUR:1.18, GBP:1}
+};
+function convertCurrencyLive() {
+  let amt = parseFloat(document.getElementById('amountCurrency').value);
+  let from = document.getElementById('fromCurr').value;
+  let to = document.getElementById('toCurr').value;
+  if (!amt) return setResult('currencyLiveResult', 'Amount required');
+  let rate = rateMatrix[from][to];
+  let result = amt * rate;
+  setResult('currencyLiveResult', `Converted: ${result.toFixed(2)} ${to}`);
+}
+
+// --- Tip Calculator ---
+function calculateTip() {
+  var b=parseFloat(document.getElementById('billTip').value);
+  var t=parseFloat(document.getElementById('tipTip').value);
+  if(!b||!t) return setResult('tipResult','Please fill all fields!');
+  var total=b+(b*t/100);
+  setResult('tipResult','Total: '+total.toFixed(2));
+}
+
+// --- Discount Calculator ---
+function calculateDiscount() {
+  var p=parseFloat(document.getElementById('priceDiscount').value);
+  var d=parseFloat(document.getElementById('discountDiscount').value);
+  if(!p||!d) return setResult('discountResult','Please fill all fields!');
+  var f=p-p*(d/100);
+  setResult('discountResult','Final Price: '+f.toFixed(2));
+}
+
+// Helper
+function setResult(id,msg){
+  document.getElementById(id).innerHTML=msg;
+}
+</script>
+</body>
+</html>
